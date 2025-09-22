@@ -56,7 +56,7 @@ ll count_inversions(int arr[], int n)
     return inv_count;
 }
 
-int main(void) 
+int main (void) 
 {
     int n;
     long long s;
@@ -80,6 +80,7 @@ int main(void)
 
     if (swaps_needed == 0) 
         printf("Butz loses!\n");
+
     else 
 	{
         long long k = s / swaps_needed + 1;

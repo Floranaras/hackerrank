@@ -6,13 +6,15 @@
 #define MAX_HILLICHURLS 100000
 #define MAX_NAME_LEN 100
 
-typedef struct 
+struct KnightResultTag
 {
 	char name[MAX_NAME_LEN];
 	int defeated;
-} KnightResult;
+};
 
-int compare_knights(const void *a, const void *b) 
+typedef struct KnightResultTag KnightResult;
+
+int compare_knights (const void *a, const void *b) 
 {
 	KnightResult *knightA = (KnightResult *)a;
 	KnightResult *knightB = (KnightResult *)b;
@@ -23,21 +25,22 @@ int compare_knights(const void *a, const void *b)
 	return strcmp(knightA->name, knightB->name);
 }
 
-int compare_ints(const void *a, const void *b) 
+int compare_ints (const void *a, const void *b) 
 {
 	return (*(int*)a - *(int*)b);
 }
 
-int max(int a, int b) 
+int max (int a, int b) 
 {
 	return a > b ? a : b;
 }
 
-int count_defeated(int hillichurls[], int h, int damage) 
+int count_defeated (int hillichurls[], int h, int damage) 
 {
 	int left = 0, right = h - 1, result = 0;
 
-	while (left <= right) {
+	while (left <= right) 
+	{
 		int mid = left + (right - left) / 2;
 		if (hillichurls[mid] <= damage) 
 		{
@@ -45,7 +48,7 @@ int count_defeated(int hillichurls[], int h, int damage)
 			left = mid + 1;
 		} 
 		else 
-	{
+		{
 			right = mid - 1;
 		}
 	}
@@ -53,7 +56,8 @@ int count_defeated(int hillichurls[], int h, int damage)
 	return result;
 }
 
-void solve(int k, int h, char names[][MAX_NAME_LEN], int atks[], int scalings[][4], int hillichurls[]) 
+void solve (int k, int h, char names[][MAX_NAME_LEN], int atks[], 
+			int scalings[][4], int hillichurls[]) 
 {
 	KnightResult results[MAX_KNIGHTS];
 
@@ -84,7 +88,7 @@ void solve(int k, int h, char names[][MAX_NAME_LEN], int atks[], int scalings[][
 	}
 }
 
-int main() 
+int main () 
 {
 	int k, h;
 	scanf("%d %d", &k, &h);

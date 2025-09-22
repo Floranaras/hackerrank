@@ -6,6 +6,7 @@ long long calculateEarnings (long long skill, int n, long long y)
 {
     long long total = 0;
     long long y2 = (long long)y * y;
+
     for (int i = 0; i < n; i++) 
 	{
         long long diff = jobs[i][0];
@@ -13,6 +14,7 @@ long long calculateEarnings (long long skill, int n, long long y)
 
         if (skill > diff) 
 			total += pay;
+		
         else if (skill == diff) 
 		{
             if (pay >= y) 
@@ -31,6 +33,7 @@ long long calculateEarnings (long long skill, int n, long long y)
 int solve (int x, int n, int g, int y) 
 {
     long long lo = 0, hi = 1;
+
     while (calculateEarnings(x + hi, n, y) < g && hi <= 2000000000LL) 
         hi *= 2;
 	
@@ -46,13 +49,16 @@ int solve (int x, int n, int g, int y)
         else 
             lo = mid + 1;
     }
+
     return (int)lo;
 }
 
 int main() 
 {
     int t;
+
     scanf("%d", &t);
+
     while (t--) 
 	{
         int x, n, g, y;
@@ -63,6 +69,7 @@ int main()
 
         printf("%d\n", solve(x, n, g, y));
     }
+
     return 0;
 }
 
