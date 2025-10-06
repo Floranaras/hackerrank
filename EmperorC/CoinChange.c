@@ -11,39 +11,61 @@ int temp[MAX_D];
 
 void read_denoms(int d)
 {
-    for (int i = 0; i < d; i++)
+    int i;
+    for(i = 0; i < d; i++)
         scanf("%d", &denoms[i]);
 }
 
 void merge(int left, int mid, int right)
 {
-    int i = left;
-    int j = mid + 1;
-    int k = left;
+    int i;
+    int j;
+    int k;
     
-    while (i <= mid && j <= right)
+    i = left;
+    j = mid + 1;
+    k = left;
+    
+    while(i <= mid && j <= right)
     {
-        if (denoms[i] <= denoms[j])
-            temp[k++] = denoms[i++];
+        if(denoms[i] <= denoms[j])
+        {
+            temp[k] = denoms[i];
+            k++;
+            i++;
+        }
         else
-            temp[k++] = denoms[j++];
+        {
+            temp[k] = denoms[j];
+            k++;
+            j++;
+        }
     }
     
-    while (i <= mid)
-        temp[k++] = denoms[i++];
+    while(i <= mid)
+    {
+        temp[k] = denoms[i];
+        k++;
+        i++;
+    }
     
-    while (j <= right)
-        temp[k++] = denoms[j++];
+    while(j <= right)
+    {
+        temp[k] = denoms[j];
+        k++;
+        j++;
+    }
     
-    for (i = left; i <= right; i++)
+    for(i = left; i <= right; i++)
         denoms[i] = temp[i];
 }
 
 void merge_sort(int left, int right)
 {
-    if (left < right)
+    int mid;
+    if(left < right)
     {
-        int mid = left + (right - left) / 2;
+        mid = left + (right - left) / 2;
         merge_sort(left, mid);
         merge_sort(mid + 1, right);
         merge(left, mid, right);
@@ -52,45 +74,57 @@ void merge_sort(int left, int right)
 
 int read_queries_and_find_max(int q)
 {
-    int max_v = 0;
-    for (int i = 0; i < q; i++)
+    int i;
+    int max_v;
+    max_v = 0;
+    for(i = 0; i < q; i++)
     {
         scanf("%d", &queries[i]);
-        if (queries[i] > max_v)
+        if(queries[i] > max_v)
             max_v = queries[i];
     }
     return max_v;
 }
 
+void initialize_dp(int max_v)
+{
+    int i;
+    dp[0] = 1;
+    for(i = 1; i <= max_v; i++)
+        dp[i] = 0;
+}
+
 void fill_dp(int d, int max_v)
 {
-    for (int c = 0; c < d; c++)
+    int c;
+    int i;
+    for(c = 0; c < d; c++)
     {
-        for (int i = denoms[c]; i <= max_v; i++)
+        for(i = denoms[c]; i <= max_v; i++)
             dp[i] = dp[i] + dp[i - denoms[c]];
     }
 }
 
 void print_results(int q)
 {
-    for (int i = 0; i < q; i++)
+    int i;
+    for(i = 0; i < q; i++)
         printf("%lld\n", dp[queries[i]]);
 }
 
 int main()
 {
-    int d, q;
+    int d;
+    int q;
+    int max_v;
+    
     scanf("%d %d", &d, &q);
     
     read_denoms(d);
     merge_sort(0, d - 1);
     
-    int max_v = read_queries_and_find_max(q);
-    
-    dp[0] = 1;
-    for (int i = 1; i <= max_v; i++)
-        dp[i] = 0;
-    
+    max_v = read_queries_and_find_max(q);
+    initialize_dp(max_v);
     fill_dp(d, max_v);
     print_results(q);
     
