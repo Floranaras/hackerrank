@@ -1,26 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-#define MAX_D 100
-#define MAX_Q 1000
-#define MAX_V 100000
-
-int denoms[MAX_D];
-int queries[MAX_Q];
-long long dp[MAX_V + 1];
-int temp[MAX_D];
-
-void read_denoms(int d)
+void read_denoms(int *denoms, int d)
 {
     int i;
     for(i = 0; i < d; i++)
         scanf("%d", &denoms[i]);
 }
 
-void merge(int left, int mid, int right)
+void merge(int *denoms, int *temp, int left, int mid, int right)
 {
-    int i;
-    int j;
-    int k;
+    int i, j, k;
+    
+    for(i = left; i <= right; i++)
+        temp[i] = denoms[i];
     
     i = left;
     j = mid + 1;
@@ -28,55 +21,34 @@ void merge(int left, int mid, int right)
     
     while(i <= mid && j <= right)
     {
-        if(denoms[i] <= denoms[j])
-        {
-            temp[k] = denoms[i];
-            k++;
-            i++;
-        }
+        if(temp[i] <= temp[j])
+            denoms[k++] = temp[i++];
         else
-        {
-            temp[k] = denoms[j];
-            k++;
-            j++;
-        }
+            denoms[k++] = temp[j++];
     }
     
     while(i <= mid)
-    {
-        temp[k] = denoms[i];
-        k++;
-        i++;
-    }
+        denoms[k++] = temp[i++];
     
     while(j <= right)
-    {
-        temp[k] = denoms[j];
-        k++;
-        j++;
-    }
-    
-    for(i = left; i <= right; i++)
-        denoms[i] = temp[i];
+        denoms[k++] = temp[j++];
 }
 
-void merge_sort(int left, int right)
+void merge_sort(int *denoms, int *temp, int left, int right)
 {
-    int mid;
     if(left < right)
     {
-        mid = left + (right - left) / 2;
-        merge_sort(left, mid);
-        merge_sort(mid + 1, right);
-        merge(left, mid, right);
+        int mid = left + (right - left) / 2;
+        merge_sort(denoms, temp, left, mid);
+        merge_sort(denoms, temp, mid + 1, right);
+        merge(denoms, temp, left, mid, right);
     }
 }
 
-int read_queries_and_find_max(int q)
+int read_queries_and_find_max(int *queries, int q)
 {
     int i;
-    int max_v;
-    max_v = 0;
+    int max_v = 0;
     for(i = 0; i < q; i++)
     {
         scanf("%d", &queries[i]);
@@ -86,7 +58,7 @@ int read_queries_and_find_max(int q)
     return max_v;
 }
 
-void initialize_dp(int max_v)
+void initialize_dp(long long *dp, int max_v)
 {
     int i;
     dp[0] = 1;
@@ -94,18 +66,17 @@ void initialize_dp(int max_v)
         dp[i] = 0;
 }
 
-void fill_dp(int d, int max_v)
+void fill_dp(long long *dp, int *denoms, int d, int max_v)
 {
-    int c;
-    int i;
+    int c, i;
     for(c = 0; c < d; c++)
     {
         for(i = denoms[c]; i <= max_v; i++)
-            dp[i] = dp[i] + dp[i - denoms[c]];
+            dp[i] += dp[i - denoms[c]];
     }
 }
 
-void print_results(int q)
+void print_results(long long *dp, int *queries, int q)
 {
     int i;
     for(i = 0; i < q; i++)
@@ -114,19 +85,40 @@ void print_results(int q)
 
 int main()
 {
-    int d;
-    int q;
-    int max_v;
+    int d, q, max_v;
     
     scanf("%d %d", &d, &q);
     
-    read_denoms(d);
-    merge_sort(0, d - 1);
+    int *denoms = (int *)malloc(d * sizeof(int));
+    int *temp = (int *)malloc(d * sizeof(int));
+    int *queries = (int *)malloc(q * sizeof(int));
     
-    max_v = read_queries_and_find_max(q);
-    initialize_dp(max_v);
-    fill_dp(d, max_v);
-    print_results(q);
+    if(denoms == NULL || temp == NULL || queries == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
+    
+    read_denoms(denoms, d);
+    merge_sort(denoms, temp, 0, d - 1);
+    
+    max_v = read_queries_and_find_max(queries, q);
+    
+    long long *dp = (long long *)malloc((max_v + 1) * sizeof(long long));
+    if(dp == NULL)
+    {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
+    
+    initialize_dp(dp, max_v);
+    fill_dp(dp, denoms, d, max_v);
+    print_results(dp, queries, q);
+    
+    free(denoms);
+    free(temp);
+    free(queries);
+    free(dp);
     
     return 0;
 }

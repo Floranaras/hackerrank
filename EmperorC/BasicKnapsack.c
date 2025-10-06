@@ -1,62 +1,46 @@
 #include <stdio.h>
 
-#define MOD 1000000007
-#define MAX_N 1000
-#define MAX_C 10000
-
-int weights[MAX_N];
-long long dp[MAX_C + 1];
-
-void read_weights(int n)
+long long min(long long a, long long b)
 {
-    int i;
-    for(i = 0; i < n; i++)
-        scanf("%d", &weights[i]);
+    if (a < b)
+        return a;
+
+    return b;
 }
 
-void initialize_dp(int capacity)
+void update_dp_state(long long *dp0, long long *dp1, int a, int b, int k)
 {
-    int i;
-    dp[0] = 1;
-    for(i = 1; i <= capacity; i++)
-        dp[i] = 0;
+    long long new_dp0 = min(*dp0 + a, *dp1 + k + a);
+    long long new_dp1 = min(*dp1 + b, *dp0 + k + b);
+    
+    *dp0 = new_dp0;
+    *dp1 = new_dp1;
 }
 
-void update_dp(int capacity, int weight)
+long long solve_assembly_lines(int n, int k)
 {
+    int a, b;
+    scanf("%d %d", &a, &b);
+    
+    long long dp0 = a;
+    long long dp1 = b;
+    
     int i;
-    for(i = capacity; i >= weight; i--)
-        dp[i] = (dp[i] + dp[i - weight]) % MOD;
-}
-
-long long calculate_sum(int capacity)
-{
-    int i;
-    long long sum;
-    sum = 0;
-    for(i = 0; i <= capacity; i++)
-        sum = (sum + dp[i]) % MOD;
-
-    return sum;
+    for (i = 1; i < n; i++)
+    {
+        scanf("%d %d", &a, &b);
+        update_dp_state(&dp0, &dp1, a, b, k);
+    }
+    
+    return min(dp0, dp1);
 }
 
 int main()
 {
-    int n;
-    int c;
-    int item;
-    long long answer;
+    int n, k;
+    scanf("%d %d", &n, &k);
     
-    scanf("%d %d", &n, &c);
-    
-    read_weights(n);
-    initialize_dp(c);
-    
-    for(item = 0; item < n; item++)
-        update_dp(c, weights[item]);
-    
-    answer = calculate_sum(c);
-    printf("%lld\n", answer);
+    printf("%lld\n", solve_assembly_lines(n, k));
     
     return 0;
 }
